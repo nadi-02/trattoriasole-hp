@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservation | Trattoria SOLE</title>
+  <meta name="description" content="Trattoria SOLEのWeb予約ページ。ご希望の日時、コースをお選びいただけます。特別な日のご要望などもお気軽にお申し付けください。">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    .reservation-container { max-width: 800px; margin: 0 auto; background: var(--color-white); padding: 4rem; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .form-group { margin-bottom: 2rem; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+    .form-label .required { color: #e74c3c; font-size: 0.8rem; margin-left: 0.5rem; vertical-align: middle; }
+    .form-control { width: 100%; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; font-family: var(--font-jp); font-size: 1rem; background-color: #fafafa; transition: border-color 0.3s; }
+    /* セレクトボックスの未選択時の文字色をプレースホルダーと同じグレーに */
+    select.form-control { color: var(--color-text); }
+    select.form-control.placeholder { color: #999; }
+    select.form-control option { color: var(--color-text); }
+    .form-control:focus { outline: none; border-color: var(--color-primary); background-color: var(--color-white); }
+    textarea.form-control { resize: vertical; min-height: 120px; }
+    .error-message { color: #e74c3c; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+    .info-section { margin-top: 5rem; border-top: 1px solid #eee; padding-top: 4rem; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .info-box h3 { font-family: var(--font-en); color: var(--color-primary); font-size: 1.5rem; margin-bottom: 1rem; }
+    .map-container { width: 100%; height: 300px; background: #eee; margin-top: 1rem; }
+    @media (max-width: 768px) {
+      .reservation-container { padding: 2rem; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    /* Flatpickr Custom Theme for Trattoria SOLE */
+    .flatpickr-calendar { font-family: var(--font-jp); box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: none; }
+    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay {
+      background: var(--color-primary); border-color: var(--color-primary);
+    }
+    .flatpickr-months .flatpickr-month { background: var(--color-primary); color: white; fill: white; }
+    .flatpickr-current-month .flatpickr-monthDropdown-months { background: var(--color-primary); }
+    .flatpickr-current-month .flatpickr-monthDropdown-months:hover { background: var(--color-primary); }
+    .flatpickr-weekdays { background: var(--color-primary); }
+    span.flatpickr-weekday { color: rgba(255,255,255,0.8); }
+
+    /* Modal Styles */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background-color: var(--color-white); padding: 2.5rem 2rem; border-radius: 4px; max-width: 500px; width: 90%; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; font-size: 1.8rem; font-weight: normal; color: #999; cursor: pointer; line-height: 1; }
+    .modal-close:hover { color: var(--color-primary); }
+    .modal-title { color: var(--color-primary); margin-bottom: 1.5rem; text-align: center; font-size: 1.25rem; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 1rem;}
+    .confirm-details { margin-bottom: 2rem; font-size: 0.95rem; }
+    .confirm-row { display: flex; border-bottom: 1px dashed #eee; padding: 0.8rem 0; }
+    .confirm-row:last-child { border-bottom: none; }
+    .confirm-label { width: 40%; font-weight: 600; color: #555; }
+    .confirm-value { width: 60%; color: #333; word-break: break-all; }
+    .modal-actions { display: flex; justify-content: space-between; gap: 1rem; }
+    .modal-actions .btn { flex: 1; padding: 0.8rem; font-size: 1rem; }
+    .btn-outline { background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+    .btn-outline:hover { background: var(--color-primary); color: white; }
+  </style>
+  <link rel="icon" href="images/favicon.png" type="image/png">
+</head>
+<body class="page-luxury">
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-top">
+      <div class="logo"><a href="index.html">Trattoria SOLE</a></div>
+      <div class="header-reserve">
+        <a href="reservation.html" class="btn btn-gold reserve-btn">Web予約</a>
+      </div>
+    </div>
+    <nav class="nav">
+      <ul class="nav-list">
+        <li><a href="index.html" class="nav-link">Top</a></li>
+        <li><a href="menu.html" class="nav-link">Menu</a></li>
+        <li><a href="wine.html" class="nav-link">Wine</a></li>
+        <li><a href="reservation.html" class="nav-link active">Reservation</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ページヘッダー -->
+  <div class="page-header fade-in">
+    <div class="page-header-content">
+      <h1 class="en-title">Reservation</h1>
+      <p class="jp-subtitle">ご予約</p>
+    </div>
+  </div>
+
+  <section class="reservation-section bg-light">
+    <div class="container">
+      
+      <div class="reservation-container fade-in">
+        <h2 class="text-center" style="margin-bottom: 2rem; color: var(--color-primary);">Web Reservation</h2>
+        <p class="text-center" style="margin-bottom: 3rem; font-size: 0.9rem;">
+          ご予約は以下のフォームより承ります。<br>
+          当日のご予約はお電話にてお願いいたします。
+        </p>
+
+        <form id="reservationForm" novalidate>
+          
+          <div class="form-group">
+            <label class="form-label" for="date">ご希望日 <span class="required">必須</span></label>
+            <input type="date" id="date" name="date" class="form-control" required>
+            <div class="error-message" id="dateError">ご希望日を選択してください。</div>
+          </div>
+
+          <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label class="form-label" for="time">ご希望時間 <span class="required">必須</span></label>
+              <select id="time" name="time" class="form-control" required>
+                <option value="">選択してください</option>
+                <optgroup label="ランチ">
+                  <option value="11:30">11:30</option>
+                  <option value="12:00">12:00</option>
+                  <option value="12:30">12:30</option>
+                  <option value="13:00">13:00</option>
+                </optgroup>
+                <optgroup label="ディナー">
+                  <option value="17:30">17:30</option>
+                  <option value="18:00">18:00</option>
+                  <option value="18:30">18:30</option>
+                  <option value="19:00">19:00</option>
+                  <option value="19:30">19:30</option>
+                  <option value="20:00">20:00</option>
+                  <option value="20:30">20:30</option>
+                </optgroup>
+              </select>
+              <div class="error-message" id="timeError">ご希望時間を選択してください。</div>
+            </div>
+            <div>
+              <label class="form-label" for="people">人数 <span class="required">必須</span></label>
+              <select id="people" name="people" class="form-control" required>
+                <option value="">選択してください</option>
+                <option value="1">1名</option>
+                <option value="2">2名</option>
+                <option value="3">3名</option>
+                <option value="4">4名</option>
+                <option value="5">5名</option>
+                <option value="6">6名</option>
+                <option value="7">7名</option>
+                <option value="8">8名</option>
+              </select>
+              <div class="error-message" id="peopleError">人数を選択してください。</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="course">コース <span class="required">必須</span></label>
+            <select id="course" name="course" class="form-control" required>
+              <option value="">選択してください</option>
+              <option value="alacarte">席のみ予約（アラカルト）</option>
+              <option value="lunch">ランチコース (¥3,800)</option>
+              <option value="dinner">ディナーコース (¥8,500)</option>
+              <option value="anniversary">記念日コース (¥12,000)</option>
+            </select>
+            <div class="error-message" id="courseError">コースを選択してください。</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="name">お名前 <span class="required">必須</span></label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="例：山田 太郎" required>
+            <div class="error-message" id="nameError">お名前を入力してください。</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">お電話番号 <span class="required">必須</span></label>
+            <input type="tel" id="phone" name="phone" class="form-control" placeholder="例：090-1234-5678" required>
+            <div class="error-message" id="phoneError">有効なお電話番号を入力してください。</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">メールアドレス <span class="required">必須</span></label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="例：info@example.com" required>
+            <div class="error-message" id="emailError">有効なメールアドレスを入力してください。</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="requests">アレルギー・ご要望</label>
+            <textarea id="requests" name="requests" class="form-control" placeholder="アレルギーの有無や、記念日のメッセージ等をご記入ください。"></textarea>
+          </div>
+
+          <div class="text-center mt-5">
+            <button type="submit" class="btn" style="width: 100%; max-width: 300px;">予約内容を送信する</button>
+          </div>
+          
+          <div id="successMessage" style="display: none; margin-top: 2rem; padding: 1.5rem; background-color: #d4edda; color: #155724; border-radius: 4px; text-align: center;">
+            ご予約リクエストを送信しました。店舗からの確認連絡をもってご予約確定となります。
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Confirm Modal -->
+      <div id="confirmModal" class="modal">
+        <div class="modal-content">
+          <span class="modal-close" id="modalClose">&times;</span>
+          <h3 class="modal-title">ご予約内容の確認</h3>
+          <div id="confirmDetails" class="confirm-details">
+            <!-- Details will be injected here via JS -->
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="btnModify">修正する</button>
+            <button type="button" class="btn btn-gold" id="btnSubmitConfirm">送信する</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section fade-in">
+        <div class="info-grid">
+          
+          <div class="info-box">
+            <h3>Contact & Policy</h3>
+            <p style="margin-bottom: 1rem;">
+              <strong>お電話でのご予約・お問い合わせ</strong><br>
+              <span style="font-size: 1.5rem; font-family: var(--font-en); color: var(--color-primary);">03-XXXX-XXXX</span><br>
+              <span style="font-size: 0.85rem; color: #666;">（受付時間 10:00 - 22:00）</span>
+            </p>
+            <p style="margin-bottom: 0.5rem; font-weight: 600;">キャンセルポリシー</p>
+            <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
+              ご予約のキャンセル・人数変更につきましては、以下の通りキャンセル料を申し受けます。<br>
+              ・前日キャンセル：コース料金の50%<br>
+              ・当日キャンセル：コース料金の100%<br>
+              ※席のみ予約の場合、お一人様あたりランチ2,000円、ディナー5,000円とさせていただきます。
+            </p>
+          </div>
+
+          <div class="info-box">
+            <h3>Access</h3>
+            <p style="margin-bottom: 0.5rem;"><strong>Trattoria SOLE</strong></p>
+            <p style="font-size: 0.9rem; margin-bottom: 1rem;">
+              〒151-0066 東京都渋谷区西原X-X-X<br>
+              代々木上原駅 東口より徒歩3分
+            </p>
+            <div class="map-container">
+              <!-- Google Maps 埋め込み（代々木上原駅付近） -->
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3241.0!2d139.6783!3d35.6657!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018f2c0a0a0a0a1%3A0x0!2z5Luj44CF5pyo5LiK5Y6f6aeF!5e0!3m2!1sja!2sjp!4v1700000000000"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">Trattoria SOLE</div>
+      <div class="footer-info">
+        <p>〒151-0066 東京都渋谷区西原X-X-X</p>
+        <p>TEL: 03-XXXX-XXXX</p>
+        <p>営業時間: ランチ 11:30-14:00 (L.O. 13:30) / ディナー 17:30-22:00 (L.O. 21:00)</p>
+        <p>定休日: 月曜日</p>
+      </div>
+      <div class="footer-nav">
+        <a href="index.html">Top</a>
+        <a href="menu.html">Menu</a>
+        <a href="wine.html">Wine</a>
+        <a href="reservation.html">Reservation</a>
+      </div>
+      <p class="copyright">&copy; 2026 Trattoria SOLE All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/reservation.js"></script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wine | Trattoria SOLE</title>
+  <meta name="description" content="Trattoria SOLEのワインリスト。専属ソムリエが厳選したイタリア各地のワインと、お料理とのペアリングをご提案します。">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 手書き風フォント（ワインリスト用） -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+  <style>
+    .sommelier-inner { display: flex; gap: 4rem; align-items: center; }
+    .sommelier-img {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .sommelier-text { flex: 1; }
+
+    /* ワインリスト - 紙に書いたようなデザイン */
+    .wine-list-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+    .wine-box {
+      background: linear-gradient(135deg, #fdf8f0 0%, #f5ead6 50%, #faf0e0 100%);
+      padding: 2.5rem 2rem 2rem;
+      border-radius: 2px;
+      box-shadow:
+        2px 3px 12px rgba(80, 50, 20, 0.12),
+        0 0 0 1px rgba(180, 150, 100, 0.15),
+        inset 0 0 40px rgba(200, 170, 120, 0.08);
+      position: relative;
+      border: 1px solid rgba(180, 150, 100, 0.25);
+    }
+    /* 紙の角の折れ表現 */
+    .wine-box::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 30px; height: 30px;
+      background: linear-gradient(225deg, var(--color-bg) 50%, rgba(200,170,120,0.25) 50%);
+      border-bottom-left-radius: 4px;
+    }
+    .wine-box h3 {
+      font-family: var(--font-en);
+      color: var(--color-primary);
+      font-size: 2rem;
+      border-bottom: 1px solid var(--color-secondary);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.03em;
+    }
+    .wine-box h3 span {
+      font-family: var(--font-jp);
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #8a6d4b;
+      margin-left: 0.5rem;
+    }
+    .wine-item {
+      margin-bottom: 1.2rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px dashed rgba(180, 150, 100, 0.3);
+    }
+    .wine-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .wine-item-name {
+      font-family: 'Playfair Display', var(--font-en), serif;
+      font-weight: 600;
+      font-style: italic;
+      display: block;
+      font-size: 1.1rem;
+      color: #3E2723;
+      letter-spacing: 0.03em;
+    }
+    .wine-item-detail {
+      font-size: 0.82rem;
+      color: #8a6d4b;
+      font-style: italic;
+    }
+
+    /* ペアリングカード - エレガントデザイン */
+    .pairing-card {
+      display: flex;
+      gap: 2rem;
+      background: var(--color-white);
+      padding: 2.5rem 2rem;
+      margin-bottom: 2rem;
+      border-radius: 2px;
+      border-left: 4px solid var(--color-secondary);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .pairing-card::before,
+    .pairing-card::after {
+      content: '';
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      border-color: var(--color-secondary);
+      border-style: solid;
+      opacity: 0.35;
+      transition: opacity 0.3s ease;
+    }
+    .pairing-card::before { top: 10px; left: 18px; border-width: 1px 0 0 1px; }
+    .pairing-card::after { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+    .pairing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+    .pairing-card:hover::before, .pairing-card:hover::after { opacity: 0.7; }
+    .pairing-card h4 { color: var(--color-primary); font-size: 1.2rem; margin-bottom: 1rem; }
+    .pairing-card .plus { font-size: 2rem; color: var(--color-secondary); font-family: var(--font-en); padding: 0 1rem; }
+
+    @media (max-width: 992px) {
+      .sommelier-inner { flex-direction: column; }
+      .wine-list-container { grid-template-columns: 1fr; }
+      .pairing-card { flex-direction: column; text-align: center; }
+    }
+  </style>
+  <link rel="icon" href="images/favicon.png" type="image/png">
+</head>
+<body class="page-luxury">
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="header-top">
+      <div class="logo"><a href="index.html">Trattoria SOLE</a></div>
+      <div class="header-reserve">
+        <a href="reservation.html" class="btn btn-gold reserve-btn">Web予約</a>
+      </div>
+    </div>
+    <nav class="nav">
+      <ul class="nav-list">
+        <li><a href="index.html" class="nav-link">Top</a></li>
+        <li><a href="menu.html" class="nav-link">Menu</a></li>
+        <li><a href="wine.html" class="nav-link active">Wine</a></li>
+        <li><a href="reservation.html" class="nav-link">Reservation</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ページヘッダー -->
+  <div class="page-header fade-in">
+    <div class="page-header-content">
+      <h1 class="en-title">Wine</h1>
+      <p class="jp-subtitle">ワインリスト</p>
+    </div>
+  </div>
+
+  <!-- ソムリエ紹介 -->
+  <section class="sommelier-section bg-light">
+    <div class="container">
+      <div class="sommelier-inner fade-in">
+        <div class="sommelier-img">
+          <div class="offset-image-container">
+            <img src="images/wine_pour.png" alt="ワインを注ぐ様子" class="offset-image">
+          </div>
+        </div>
+        <div class="sommelier-text">
+          <h2 class="en-title" style="text-align: left;">Sommelier</h2>
+          <p class="jp-subtitle" style="text-align: left;">ソムリエのご紹介</p>
+          <p style="margin-bottom: 2rem;">
+            「ワインは料理を完成させる最後のピースです。お客様の好みやその日の気分に合わせて、最高の1杯をご提案いたします。イタリア全土から厳選したワインとの出会いをお楽しみください。」
+          </p>
+          <p style="font-weight: 600;">ソムリエ 高橋 涼</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ワインリスト -->
+  <section class="wine-section">
+    <div class="container">
+      <h2 class="en-title fade-in">Wine List</h2>
+      <p class="jp-subtitle fade-in">グラス ¥900〜 / ボトル ¥4,500〜</p>
+      
+      <div class="wine-list-container fade-in">
+        
+        <!-- Spumante -->
+        <div class="wine-box">
+          <h3>Spumante <span>スパークリング</span></h3>
+          <div class="wine-item">
+            <span class="wine-item-name">プロセッコ・ディ・ヴァルドッビアーデネ</span>
+            <span class="wine-item-detail">ヴェネト州 / グレーラ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">フランチャコルタ・アルマ・キュヴェ</span>
+            <span class="wine-item-detail">ロンバルディア州 / シャルドネ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">フェッラーリ・マキシマム・ブラン・ド・ブラン</span>
+            <span class="wine-item-detail">トレンティーノ州 / シャルドネ</span>
+          </div>
+        </div>
+
+        <!-- Bianco -->
+        <div class="wine-box">
+          <h3>Bianco <span>白ワイン</span></h3>
+          <div class="wine-item">
+            <span class="wine-item-name">ソアーヴェ・クラッシコ</span>
+            <span class="wine-item-detail">ヴェネト州 / ガルガネガ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">ヴェルメンティーノ・ディ・ガッルーラ</span>
+            <span class="wine-item-detail">サルデーニャ州 / ヴェルメンティーノ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">ガヴィ・ディ・ガヴィ</span>
+            <span class="wine-item-detail">ピエモンテ州 / コルテーゼ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">チェルヴァロ・デッラ・サラ</span>
+            <span class="wine-item-detail">ウンブリア州 / シャルドネ、グレケット</span>
+          </div>
+        </div>
+
+        <!-- Rosso -->
+        <div class="wine-box">
+          <h3>Rosso <span>赤ワイン</span></h3>
+          <div class="wine-item">
+            <span class="wine-item-name">キャンティ・クラッシコ・レゼルヴァ</span>
+            <span class="wine-item-detail">トスカーナ州 / サンジョヴェーゼ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">バローロ</span>
+            <span class="wine-item-detail">ピエモンテ州 / ネッビオーロ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">アマローネ・デッラ・ヴァルポリチェッラ</span>
+            <span class="wine-item-detail">ヴェネト州 / コルヴィーナ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">ブルネッロ・ディ・モンタルチーノ</span>
+            <span class="wine-item-detail">トスカーナ州 / サンジョヴェーゼ・グロッソ</span>
+          </div>
+          <div class="wine-item">
+            <span class="wine-item-name">タウラージ</span>
+            <span class="wine-item-detail">カンパーニア州 / アリアニコ</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ペアリング提案 -->
+  <section class="pairing-section" style="background: linear-gradient(135deg, #5C1A2A 0%, #3D1520 100%); color: var(--color-bg);">
+    <div class="container">
+      <h2 class="en-title fade-in" style="color: var(--color-secondary);">Mariage</h2>
+      <p class="jp-subtitle fade-in" style="color: var(--color-white);">ソムリエおすすめのペアリング</p>
+      
+      <div class="pairing-card fade-in" style="background-color: var(--color-white); color: var(--color-text);">
+        <div style="flex: 1; text-align: right;">
+          <h4>自家製タリアテッレ ボロネーゼ</h4>
+          <p style="font-size: 0.9rem;">お肉の濃厚な旨味を持つボロネーゼソース。</p>
+        </div>
+        <div class="plus">+</div>
+        <div style="flex: 1; text-align: left;">
+          <h4>キャンティ・クラッシコ</h4>
+          <p style="font-size: 0.9rem;">サンジョヴェーゼ特有の酸味と果実味が、ソースのコクをすっきりとさせ、絶妙なハーモニーを生み出します。</p>
+        </div>
+      </div>
+
+      <div class="pairing-card fade-in" style="background-color: var(--color-white); color: var(--color-text);">
+        <div style="flex: 1; text-align: right;">
+          <h4>鮮魚のアクアパッツァ</h4>
+          <p style="font-size: 0.9rem;">魚介の出汁とトマト、オリーブの旨味が詰まった一皿。</p>
+        </div>
+        <div class="plus">+</div>
+        <div style="flex: 1; text-align: left;">
+          <h4>ヴェルメンティーノ</h4>
+          <p style="font-size: 0.9rem;">海風を感じるミネラル感と爽やかな柑橘の香りが、魚介の風味を最大限に引き立てます。</p>
+        </div>
+      </div>
+
+      <div class="pairing-card fade-in" style="background-color: var(--color-white); color: var(--color-text);">
+        <div style="flex: 1; text-align: right;">
+          <h4>和牛のタリアータ バルサミコソース</h4>
+          <p style="font-size: 0.9rem;">和牛の脂の甘みとバルサミコの酸味が特徴。</p>
+        </div>
+        <div class="plus">+</div>
+        <div style="flex: 1; text-align: left;">
+          <h4>バローロ</h4>
+          <p style="font-size: 0.9rem;">「ワインの王」と呼ばれる力強いタンニンと複雑な香りが、和牛の力強い味わいを受け止めます。</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">Trattoria SOLE</div>
+      <div class="footer-info">
+        <p>〒151-0066 東京都渋谷区西原X-X-X</p>
+        <p>TEL: 03-XXXX-XXXX</p>
+        <p>営業時間: ランチ 11:30-14:00 (L.O. 13:30) / ディナー 17:30-22:00 (L.O. 21:00)</p>
+        <p>定休日: 月曜日</p>
+      </div>
+      <div class="footer-nav">
+        <a href="index.html">Top</a>
+        <a href="menu.html">Menu</a>
+        <a href="wine.html">Wine</a>
+        <a href="reservation.html">Reservation</a>
+      </div>
+      <p class="copyright">&copy; 2026 Trattoria SOLE All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
