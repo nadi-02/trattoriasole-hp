@@ -726,6 +726,7 @@ section {
 .page-header-content {
   position: relative;
   z-index: 1;
+  margin-top: 3rem; /* ヘッダーから離して下寄りにバランスを調整 */
 }
 
 .page-header .en-title {
