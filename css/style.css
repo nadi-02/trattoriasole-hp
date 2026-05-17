@@ -1017,13 +1017,13 @@ section {
 @media (max-width: 768px) {
   .header-top {
     flex-direction: column;
-    padding-bottom: 0;
+    padding: 0.5rem 20px 0; /* 上部の余白を減らしてヘッダー全体を細く */
   }
   .header-reserve {
     position: static;
     transform: none;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 0; /* ロゴにさらに近づける */
+    margin-bottom: 0.8rem; /* 下のメニューとの空間を少し広めに確保 */
   }
   .nav-list {
     gap: 1.5rem;
